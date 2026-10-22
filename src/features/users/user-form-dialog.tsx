@@ -138,6 +138,7 @@ export function UserFormDialog({ mode, onClose }: { mode: Mode | null; onClose: 
           email={created.user.email}
           password={created.temporaryPassword}
           intro="Share this temporary password with them securely."
+          emailQueued={created.emailQueued}
         />
       </Dialog>
     );

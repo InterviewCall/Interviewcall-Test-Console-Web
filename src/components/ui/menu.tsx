@@ -108,7 +108,7 @@ export function Menu({ label, entries }: { label: string; entries: MenuEntry[] }
               role="menu"
               aria-label={label}
               onKeyDown={onKeyDown}
-              className="fixed left-0 top-0 z-50 w-60 rounded-panel border border-line bg-surface p-1.5 shadow-pop"
+              className="fixed left-0 top-0 z-50 w-60 rounded-panel border border-line bg-surface shadow-card p-1.5 shadow-pop"
             >
               {entries.map((entry, index) =>
                 "separator" in entry ? (

@@ -109,7 +109,7 @@ export function UsersScreen() {
         }
       />
 
-      <section className="rounded-panel border border-line bg-surface">
+      <section className="rounded-panel border border-line bg-surface shadow-card">
         <div className="flex flex-col gap-3 border-b border-line p-4 sm:flex-row sm:items-center">
           <div className="relative sm:max-w-xs sm:flex-1">
             <Icon name="search" size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-faint" />

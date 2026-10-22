@@ -51,6 +51,7 @@ export function Dialog({ open, onClose, title, description, children, footer, si
     >
       {open ? (
         <div className="flex max-h-[calc(100dvh-2rem)] flex-col">
+          <div aria-hidden="true" className="h-1.5 shrink-0 bg-brand" />
           <div className="flex items-start justify-between gap-4 px-6 pt-6">
             <div className="min-w-0">
               <h2 id="dialog-title" className="font-display text-xl font-semibold leading-tight tracking-tight">

@@ -18,14 +18,15 @@ export function useSessionUser(): User {
 }
 
 export interface NavItem {
-  href: "/users" | "/account";
+  href: "/tests" | "/users" | "/account";
   label: string;
-  icon: "users" | "account";
+  icon: "calendar" | "users" | "account";
   roles?: readonly UserRole[];
 }
 
 /** Every page the console has today. New features add themselves here. */
 export const NAV_ITEMS: readonly NavItem[] = [
+  { href: "/tests", label: "Tests", icon: "calendar", roles: ["ADMIN", "ADVISOR"] },
   { href: "/users", label: "Staff", icon: "users", roles: ["ADMIN"] },
   { href: "/account", label: "Your account", icon: "account" },
 ];

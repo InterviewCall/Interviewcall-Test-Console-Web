@@ -192,6 +192,80 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/test-schedules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List scheduled tests. Advisors see their own; admins see everyone’s. */
+        get: operations["TestSchedulesController_list"];
+        put?: never;
+        /**
+         * Schedule a test for a candidate and email them the invitation
+         * @description Creates the candidate if the email is new. A candidate has one test. The duration comes from the level: Intermediate 22 minutes, Advanced 12.
+         */
+        post: operations["TestSchedulesController_schedule"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/test-schedules/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["TestSchedulesController_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/test-schedules/{id}/reschedule": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Move a test to a new start window and email the candidate the new time
+         * @description Only the window changes; the level and duration stay. Allowed while the candidate has not started (invited, including a missed slot, or expired); a test in progress or submitted returns 409.
+         */
+        post: operations["TestSchedulesController_reschedule"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/test-schedules/{id}/resend-email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Queue the invitation email again */
+        post: operations["TestSchedulesController_resendEmail"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/health": {
         parameters: {
             query?: never;
@@ -480,6 +554,8 @@ export interface operations {
                         };
                         /** @description Shown once. The user must change it at first sign-in. Share it over a private channel. */
                         temporaryPassword: string;
+                        /** @description True when the sign-in details were queued to the user by email. False: pass the password on yourself. */
+                        emailQueued: boolean;
                     };
                 };
             };
@@ -629,6 +705,8 @@ export interface operations {
                         };
                         /** @description Shown once. The user must change it at first sign-in. Share it over a private channel. */
                         temporaryPassword: string;
+                        /** @description True when the sign-in details were queued to the user by email. False: pass the password on yourself. */
+                        emailQueued: boolean;
                     };
                 };
             };
@@ -667,6 +745,342 @@ export interface operations {
                         };
                         /** @description Shown once. The user must change it at first sign-in. Share it over a private channel. */
                         temporaryPassword: string;
+                        /** @description True when the sign-in details were queued to the user by email. False: pass the password on yourself. */
+                        emailQueued: boolean;
+                    };
+                };
+            };
+        };
+    };
+    TestSchedulesController_list: {
+        parameters: {
+            query?: {
+                page?: number;
+                pageSize?: number;
+                status?: "INVITED" | "IN_PROGRESS" | "SUBMITTED" | "EXPIRED";
+                level?: "INTERMEDIATE" | "ADVANCED";
+                q?: string;
+                invitedById?: number;
+                startsFrom?: string;
+                startsTo?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items: {
+                            id: number;
+                            /** @enum {string} */
+                            level: "INTERMEDIATE" | "ADVANCED";
+                            /** @description Fixed by the level when scheduled: Intermediate 22, Advanced 12 */
+                            durationMinutes: number;
+                            /** Format: date-time */
+                            startsAt: string;
+                            /** Format: date-time */
+                            endsAt: string;
+                            /**
+                             * Format: date-time
+                             * @description The last moment the candidate can start and still get the full duration
+                             */
+                            latestStartAt: string;
+                            /** @enum {string} */
+                            status: "INVITED" | "IN_PROGRESS" | "SUBMITTED" | "EXPIRED";
+                            /**
+                             * Format: date-time
+                             * @description Null until the invitation email has been queued
+                             */
+                            invitationQueuedAt: string | null;
+                            /** Format: date-time */
+                            createdAt: string;
+                            candidate: {
+                                id: number;
+                                fullName: string;
+                                email: string;
+                                phone: string | null;
+                            };
+                            invitedBy: {
+                                id: number;
+                                fullName: string;
+                            };
+                        }[];
+                        total: number;
+                        page: number;
+                        pageSize: number;
+                    };
+                };
+            };
+        };
+    };
+    TestSchedulesController_schedule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    candidate: {
+                        fullName: string;
+                        email: string;
+                        phone?: string;
+                    };
+                    /** @enum {string} */
+                    level: "INTERMEDIATE" | "ADVANCED";
+                    /**
+                     * Format: date-time
+                     * @description When the candidate may first start the test
+                     */
+                    startsAt: string;
+                    /**
+                     * Format: date-time
+                     * @description When the start window closes
+                     */
+                    endsAt: string;
+                };
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        schedule: {
+                            id: number;
+                            /** @enum {string} */
+                            level: "INTERMEDIATE" | "ADVANCED";
+                            /** @description Fixed by the level when scheduled: Intermediate 22, Advanced 12 */
+                            durationMinutes: number;
+                            /** Format: date-time */
+                            startsAt: string;
+                            /** Format: date-time */
+                            endsAt: string;
+                            /**
+                             * Format: date-time
+                             * @description The last moment the candidate can start and still get the full duration
+                             */
+                            latestStartAt: string;
+                            /** @enum {string} */
+                            status: "INVITED" | "IN_PROGRESS" | "SUBMITTED" | "EXPIRED";
+                            /**
+                             * Format: date-time
+                             * @description Null until the invitation email has been queued
+                             */
+                            invitationQueuedAt: string | null;
+                            /** Format: date-time */
+                            createdAt: string;
+                            candidate: {
+                                id: number;
+                                fullName: string;
+                                email: string;
+                                phone: string | null;
+                            };
+                            invitedBy: {
+                                id: number;
+                                fullName: string;
+                            };
+                        };
+                        /** @description True when the invitation email was queued. False: use resend-email once the problem is fixed. */
+                        emailQueued: boolean;
+                    };
+                };
+            };
+        };
+    };
+    TestSchedulesController_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: number;
+                        /** @enum {string} */
+                        level: "INTERMEDIATE" | "ADVANCED";
+                        /** @description Fixed by the level when scheduled: Intermediate 22, Advanced 12 */
+                        durationMinutes: number;
+                        /** Format: date-time */
+                        startsAt: string;
+                        /** Format: date-time */
+                        endsAt: string;
+                        /**
+                         * Format: date-time
+                         * @description The last moment the candidate can start and still get the full duration
+                         */
+                        latestStartAt: string;
+                        /** @enum {string} */
+                        status: "INVITED" | "IN_PROGRESS" | "SUBMITTED" | "EXPIRED";
+                        /**
+                         * Format: date-time
+                         * @description Null until the invitation email has been queued
+                         */
+                        invitationQueuedAt: string | null;
+                        /** Format: date-time */
+                        createdAt: string;
+                        candidate: {
+                            id: number;
+                            fullName: string;
+                            email: string;
+                            phone: string | null;
+                        };
+                        invitedBy: {
+                            id: number;
+                            fullName: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    TestSchedulesController_reschedule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * Format: date-time
+                     * @description The new time the candidate may first start the test
+                     */
+                    startsAt: string;
+                    /**
+                     * Format: date-time
+                     * @description The new time the start window closes
+                     */
+                    endsAt: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        schedule: {
+                            id: number;
+                            /** @enum {string} */
+                            level: "INTERMEDIATE" | "ADVANCED";
+                            /** @description Fixed by the level when scheduled: Intermediate 22, Advanced 12 */
+                            durationMinutes: number;
+                            /** Format: date-time */
+                            startsAt: string;
+                            /** Format: date-time */
+                            endsAt: string;
+                            /**
+                             * Format: date-time
+                             * @description The last moment the candidate can start and still get the full duration
+                             */
+                            latestStartAt: string;
+                            /** @enum {string} */
+                            status: "INVITED" | "IN_PROGRESS" | "SUBMITTED" | "EXPIRED";
+                            /**
+                             * Format: date-time
+                             * @description Null until the invitation email has been queued
+                             */
+                            invitationQueuedAt: string | null;
+                            /** Format: date-time */
+                            createdAt: string;
+                            candidate: {
+                                id: number;
+                                fullName: string;
+                                email: string;
+                                phone: string | null;
+                            };
+                            invitedBy: {
+                                id: number;
+                                fullName: string;
+                            };
+                        };
+                        /** @description True when the invitation email was queued. False: use resend-email once the problem is fixed. */
+                        emailQueued: boolean;
+                    };
+                };
+            };
+        };
+    };
+    TestSchedulesController_resendEmail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        schedule: {
+                            id: number;
+                            /** @enum {string} */
+                            level: "INTERMEDIATE" | "ADVANCED";
+                            /** @description Fixed by the level when scheduled: Intermediate 22, Advanced 12 */
+                            durationMinutes: number;
+                            /** Format: date-time */
+                            startsAt: string;
+                            /** Format: date-time */
+                            endsAt: string;
+                            /**
+                             * Format: date-time
+                             * @description The last moment the candidate can start and still get the full duration
+                             */
+                            latestStartAt: string;
+                            /** @enum {string} */
+                            status: "INVITED" | "IN_PROGRESS" | "SUBMITTED" | "EXPIRED";
+                            /**
+                             * Format: date-time
+                             * @description Null until the invitation email has been queued
+                             */
+                            invitationQueuedAt: string | null;
+                            /** Format: date-time */
+                            createdAt: string;
+                            candidate: {
+                                id: number;
+                                fullName: string;
+                                email: string;
+                                phone: string | null;
+                            };
+                            invitedBy: {
+                                id: number;
+                                fullName: string;
+                            };
+                        };
+                        /** @description True when the invitation email was queued. False: use resend-email once the problem is fixed. */
+                        emailQueued: boolean;
                     };
                 };
             };

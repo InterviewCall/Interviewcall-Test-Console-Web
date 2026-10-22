@@ -30,3 +30,16 @@ export type UpdateUserBody = RequestBody<"UsersController_update">;
 
 export const USER_ROLES: readonly UserRole[] = ["ADMIN", "ADVISOR", "EDITOR"];
 export const USER_STATUSES: readonly UserStatus[] = ["ACTIVE", "UNACTIVATED", "INACTIVE"];
+
+export type TestSchedulePage = Body<"TestSchedulesController_list", 200>;
+export type TestSchedule = TestSchedulePage["items"][number];
+export type TestLevel = TestSchedule["level"];
+export type TestStatus = TestSchedule["status"];
+export type ListTestSchedulesParams = NonNullable<operations["TestSchedulesController_list"]["parameters"]["query"]>;
+export type ScheduleTestBody = RequestBody<"TestSchedulesController_schedule">;
+export type RescheduleTestBody = RequestBody<"TestSchedulesController_reschedule">;
+/** What scheduling and resending return: the schedule, and whether its invitation email was queued. */
+export type ScheduleWithEmailStatus = Body<"TestSchedulesController_schedule", 201>;
+
+export const TEST_LEVELS: readonly TestLevel[] = ["INTERMEDIATE", "ADVANCED"];
+export const TEST_STATUSES: readonly TestStatus[] = ["INVITED", "IN_PROGRESS", "SUBMITTED", "EXPIRED"];

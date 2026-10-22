@@ -21,6 +21,7 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Everything except the API, Next internals, static files and the login page itself.
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|login).*)"],
+  // Everything except the API, Next internals, files in /public (the logo has to load on the login
+  // page, before anyone has a session) and the login page itself.
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|images/|login).*)"],
 };

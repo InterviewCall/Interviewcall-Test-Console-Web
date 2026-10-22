@@ -44,6 +44,7 @@ export function UserActionDialog({ action, onClose }: { action: UserAction | nul
           name={result.user.fullName}
           email={result.user.email}
           password={result.temporaryPassword}
+          emailQueued={result.emailQueued}
           intro={
             kind === "reset"
               ? "Their old password and all their sessions no longer work."

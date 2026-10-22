@@ -10,7 +10,7 @@ export function AdminOnly({ children }: { children: ReactNode }) {
   const user = useSessionUser();
   if (user.role === "ADMIN") return <>{children}</>;
   return (
-    <div className="rounded-panel border border-line bg-surface">
+    <div className="rounded-panel border border-line bg-surface shadow-card">
       <EmptyState
         icon="key"
         title="Admins only"

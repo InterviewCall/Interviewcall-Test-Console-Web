@@ -12,7 +12,7 @@ const tones: Record<Tone, string> = {
   info: "bg-primary-tint text-primary ring-transparent",
 };
 
-export function Badge({ tone = "neutral", children, className }: { tone?: Tone; children: ReactNode; className?: string }) {
+export function Badge({ tone = "neutral", dot = false, children, className }: { tone?: Tone; /** A small status dot before the label. */ dot?: boolean; children: ReactNode; className?: string }) {
   return (
     <span
       className={cn(
@@ -21,6 +21,7 @@ export function Badge({ tone = "neutral", children, className }: { tone?: Tone; 
         className,
       )}
     >
+      {dot ? <span aria-hidden="true" className="size-1.5 rounded-full bg-current" /> : null}
       {children}
     </span>
   );

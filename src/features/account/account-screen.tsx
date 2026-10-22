@@ -17,7 +17,7 @@ import { ROLE_LABEL } from "@/features/users/labels";
 
 function Panel({ title, description, children }: { title: string; description?: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-panel border border-line bg-surface">
+    <section className="rounded-panel border border-line bg-surface shadow-card">
       <div className="border-b border-line px-6 py-4">
         <h2 className="font-display text-base font-semibold">{title}</h2>
         {description ? <p className="mt-0.5 text-[13px] text-ink-muted">{description}</p> : null}

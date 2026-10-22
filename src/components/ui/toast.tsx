@@ -64,7 +64,7 @@ function ToastCard({ item, onDismiss }: { item: ToastItem; onDismiss: (id: numbe
   return (
     <div
       data-toast
-      className="pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-panel border border-line bg-surface p-3.5 shadow-pop animate-[toast-in_180ms_ease-out]"
+      className="pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-panel border border-line bg-surface shadow-card p-3.5 shadow-pop animate-[toast-in_180ms_ease-out]"
     >
       <span className={cn("mt-0.5 inline-flex size-6 shrink-0 items-center justify-center rounded-full", tone.badge)}>
         <Icon name={tone.icon} size={14} />
