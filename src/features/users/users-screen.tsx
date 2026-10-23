@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -72,7 +74,8 @@ function LoadingRows() {
 
 export function UsersScreen() {
   const me = useSessionUser();
-  // Managers can look at the staff list; only admins can change it.
+  const router = useRouter();
+  // Managers can look at the staff list; only admins can change it, or open a person's page.
   const canManage = me.role === "ADMIN";
   const [search, setSearch] = useState("");
   const [role, setRole] = useState<UserRole | "">("");
@@ -219,13 +222,32 @@ export function UsersScreen() {
                 {users.data.items.map((user) => {
                   const isSelf = user.id === me.id;
                   return (
-                    <tr key={user.id} className="hover:bg-sunken/60">
+                    <tr
+                      key={user.id}
+                      className={canManage ? "cursor-pointer hover:bg-sunken/60" : "hover:bg-sunken/60"}
+                      // The name is a real link for keyboard and screen-reader users; this is the mouse shortcut.
+                      // Clicks on the name link and on the actions menu keep doing their own thing.
+                      onClick={
+                        canManage
+                          ? (event) => {
+                              if ((event.target as HTMLElement).closest("a, button, [role='menu'], [role='menuitem']")) return;
+                              router.push(`/users/${user.id}`);
+                            }
+                          : undefined
+                      }
+                    >
                       <Td>
                         <div className="flex items-center gap-3">
                           <Avatar name={user.fullName} seed={user.id} />
                           <div className="min-w-0">
                             <p className="flex items-center gap-2 font-medium">
-                              <span className="truncate">{user.fullName}</span>
+                              {canManage ? (
+                                <Link href={`/users/${user.id}`} className="truncate hover:underline">
+                                  {user.fullName}
+                                </Link>
+                              ) : (
+                                <span className="truncate">{user.fullName}</span>
+                              )}
                               {isSelf ? <Badge tone="neutral">You</Badge> : null}
                             </p>
                             <p className="truncate text-[13px] text-ink-muted">{user.email}</p>

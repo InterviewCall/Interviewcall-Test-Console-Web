@@ -141,6 +141,23 @@ export interface paths {
         patch: operations["UsersController_update"];
         trace?: never;
     };
+    "/api/v1/users/{id}/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Where a staff member is signed in right now. Admins only; it can't sign anyone out. */
+        get: operations["UsersController_sessions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/users/{id}/deactivate": {
         parameters: {
             query?: never;
@@ -780,6 +797,37 @@ export interface operations {
                         /** Format: date-time */
                         createdAt: string;
                     };
+                };
+            };
+        };
+    };
+    UsersController_sessions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: number;
+                        ip: string | null;
+                        userAgent: string | null;
+                        /** Format: date-time */
+                        createdAt: string;
+                        /** Format: date-time */
+                        lastSeenAt: string;
+                        /** @description True for the session making this request */
+                        current: boolean;
+                    }[];
                 };
             };
         };

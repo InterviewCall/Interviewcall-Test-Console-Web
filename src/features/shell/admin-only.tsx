@@ -10,7 +10,16 @@ import { useSessionUser } from "./session";
  * The API enforces this too; this just avoids showing a page that would only error.
  * Admins only, unless the page names more roles.
  */
-export function AdminOnly({ children, also = [] }: { children: ReactNode; also?: readonly UserRole[] }) {
+export function AdminOnly({
+  children,
+  also = [],
+  description,
+}: {
+  children: ReactNode;
+  also?: readonly UserRole[];
+  /** What to say to someone who can't see the page. */
+  description?: string;
+}) {
   const user = useSessionUser();
   if (user.role === "ADMIN" || also.includes(user.role)) return <>{children}</>;
   const withManagers = also.includes("MANAGER");
@@ -25,7 +34,7 @@ export function AdminOnly({ children, also = [] }: { children: ReactNode; also?:
           </Link>
         }
       >
-        Your role doesn&apos;t include the staff list. Ask an admin if you need something changed.
+        {description ?? "Your role doesn't include the staff list. Ask an admin if you need something changed."}
       </EmptyState>
     </div>
   );
