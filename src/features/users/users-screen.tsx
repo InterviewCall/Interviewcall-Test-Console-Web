@@ -72,6 +72,8 @@ function LoadingRows() {
 
 export function UsersScreen() {
   const me = useSessionUser();
+  // Managers can look at the staff list; only admins can change it.
+  const canManage = me.role === "ADMIN";
   const [search, setSearch] = useState("");
   const [role, setRole] = useState<UserRole | "">("");
   const [status, setStatus] = useState<UserStatus | "">("");
@@ -101,11 +103,13 @@ export function UsersScreen() {
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Staff"
-        description="Everyone who can sign in to this console."
+        description={canManage ? "Everyone who can sign in to this console." : "Everyone who can sign in to this console. Only admins can change accounts."}
         actions={
-          <Button icon="plus" onClick={() => setFormMode({ kind: "create" })}>
-            Add staff member
-          </Button>
+          canManage ? (
+            <Button icon="plus" onClick={() => setFormMode({ kind: "create" })}>
+              Add staff member
+            </Button>
+          ) : undefined
         }
       />
 
@@ -190,9 +194,9 @@ export function UsersScreen() {
             <EmptyState
               icon="users"
               title="No staff yet"
-              action={<Button icon="plus" onClick={() => setFormMode({ kind: "create" })}>Add staff member</Button>}
+              action={canManage ? <Button icon="plus" onClick={() => setFormMode({ kind: "create" })}>Add staff member</Button> : undefined}
             >
-              Add the first person who will use this console.
+              {canManage ? "Add the first person who will use this console." : "Nobody else has an account yet."}
             </EmptyState>
           )
         ) : (
@@ -204,9 +208,11 @@ export function UsersScreen() {
                   <Th className="hidden sm:table-cell">Role</Th>
                   <Th className="hidden sm:table-cell">Status</Th>
                   <Th className="hidden md:table-cell">Last sign-in</Th>
-                  <Th className="w-14">
-                    <span className="sr-only">Actions</span>
-                  </Th>
+                  {canManage ? (
+                    <Th className="w-14">
+                      <span className="sr-only">Actions</span>
+                    </Th>
+                  ) : null}
                 </tr>
               </thead>
               <tbody>
@@ -242,15 +248,17 @@ export function UsersScreen() {
                           {formatRelative(user.lastLoginAt, "Not yet")}
                         </span>
                       </Td>
-                      <Td className="text-right">
-                        <Menu
-                          label={`Actions for ${user.fullName}`}
-                          entries={rowMenu(user, isSelf, {
-                            edit: () => setFormMode({ kind: "edit", user, isSelf }),
-                            act: (kind) => setAction({ kind, user }),
-                          })}
-                        />
-                      </Td>
+                      {canManage ? (
+                        <Td className="text-right">
+                          <Menu
+                            label={`Actions for ${user.fullName}`}
+                            entries={rowMenu(user, isSelf, {
+                              edit: () => setFormMode({ kind: "edit", user, isSelf }),
+                              act: (kind) => setAction({ kind, user }),
+                            })}
+                          />
+                        </Td>
+                      ) : null}
                     </tr>
                   );
                 })}
@@ -267,8 +275,12 @@ export function UsersScreen() {
         )}
       </section>
 
-      <UserFormDialog mode={formMode} onClose={() => setFormMode(null)} />
-      <UserActionDialog action={action} onClose={() => setAction(null)} />
+      {canManage ? (
+        <>
+          <UserFormDialog mode={formMode} onClose={() => setFormMode(null)} />
+          <UserActionDialog action={action} onClose={() => setAction(null)} />
+        </>
+      ) : null}
     </div>
   );
 }

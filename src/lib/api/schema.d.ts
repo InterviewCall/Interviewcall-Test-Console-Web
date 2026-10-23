@@ -266,6 +266,152 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/test-schedules/{id}/report": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The report for a submitted test: score, topics and every answer next to the key
+         * @description Staff only. It contains the answer key, so it is never served to candidates. Advisors can open reports for their own candidates; admins for everyone. Returns 409 until the candidate has submitted.
+         */
+        get: operations["ReportsController_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/candidate/session": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Open the test link: swap the secret from the email plus the candidate’s email for a session cookie
+         * @description Works until the slot ends. After that, or once the test has expired, an advisor or admin has to reschedule it to send a new link.
+         */
+        post: operations["CandidateController_createSession"];
+        /** Sign out of the test portal */
+        delete: operations["CandidateController_endSession"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/candidate/test": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The candidate’s test: where they are in it, the window, and what it contains */
+        get: operations["CandidateController_getTest"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/candidate/attempt/start": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Start the test, or resume it
+         * @description The clock starts on the server now. Calling it again returns the same attempt with the same deadline.
+         */
+        post: operations["CandidateController_startAttempt"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/candidate/attempt": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The questions, saved answers and server deadline. Used to resume after a refresh. */
+        get: operations["CandidateController_getAttempt"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/candidate/attempt/answers/{questionVersionId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Save the chosen option for one question. Send optionId null to clear it. */
+        put: operations["CandidateController_saveAnswer"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/candidate/attempt/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Submit the test. Safe to repeat. */
+        post: operations["CandidateController_submit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/candidate/feedback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Rate the experience after submitting */
+        post: operations["CandidateController_feedback"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/health": {
         parameters: {
             query?: never;
@@ -322,7 +468,7 @@ export interface operations {
                         email: string;
                         phone: string;
                         /** @enum {string} */
-                        role: "ADMIN" | "ADVISOR" | "EDITOR";
+                        role: "ADMIN" | "ADVISOR" | "EDITOR" | "MANAGER";
                         /** @enum {string} */
                         status: "UNACTIVATED" | "ACTIVE" | "INACTIVE";
                         /** Format: date-time */
@@ -371,7 +517,7 @@ export interface operations {
                         email: string;
                         phone: string;
                         /** @enum {string} */
-                        role: "ADMIN" | "ADVISOR" | "EDITOR";
+                        role: "ADMIN" | "ADVISOR" | "EDITOR" | "MANAGER";
                         /** @enum {string} */
                         status: "UNACTIVATED" | "ACTIVE" | "INACTIVE";
                         /** Format: date-time */
@@ -410,7 +556,7 @@ export interface operations {
                         email: string;
                         phone: string;
                         /** @enum {string} */
-                        role: "ADMIN" | "ADVISOR" | "EDITOR";
+                        role: "ADMIN" | "ADVISOR" | "EDITOR" | "MANAGER";
                         /** @enum {string} */
                         status: "UNACTIVATED" | "ACTIVE" | "INACTIVE";
                         /** Format: date-time */
@@ -475,7 +621,7 @@ export interface operations {
             query?: {
                 page?: number;
                 pageSize?: number;
-                role?: "ADMIN" | "ADVISOR" | "EDITOR";
+                role?: "ADMIN" | "ADVISOR" | "EDITOR" | "MANAGER";
                 status?: "UNACTIVATED" | "ACTIVE" | "INACTIVE";
                 q?: string;
             };
@@ -497,7 +643,7 @@ export interface operations {
                             email: string;
                             phone: string;
                             /** @enum {string} */
-                            role: "ADMIN" | "ADVISOR" | "EDITOR";
+                            role: "ADMIN" | "ADVISOR" | "EDITOR" | "MANAGER";
                             /** @enum {string} */
                             status: "UNACTIVATED" | "ACTIVE" | "INACTIVE";
                             /** Format: date-time */
@@ -527,7 +673,7 @@ export interface operations {
                     email: string;
                     phone: string;
                     /** @enum {string} */
-                    role: "ADMIN" | "ADVISOR" | "EDITOR";
+                    role: "ADMIN" | "ADVISOR" | "EDITOR" | "MANAGER";
                 };
             };
         };
@@ -544,7 +690,7 @@ export interface operations {
                             email: string;
                             phone: string;
                             /** @enum {string} */
-                            role: "ADMIN" | "ADVISOR" | "EDITOR";
+                            role: "ADMIN" | "ADVISOR" | "EDITOR" | "MANAGER";
                             /** @enum {string} */
                             status: "UNACTIVATED" | "ACTIVE" | "INACTIVE";
                             /** Format: date-time */
@@ -583,7 +729,7 @@ export interface operations {
                         email: string;
                         phone: string;
                         /** @enum {string} */
-                        role: "ADMIN" | "ADVISOR" | "EDITOR";
+                        role: "ADMIN" | "ADVISOR" | "EDITOR" | "MANAGER";
                         /** @enum {string} */
                         status: "UNACTIVATED" | "ACTIVE" | "INACTIVE";
                         /** Format: date-time */
@@ -610,7 +756,7 @@ export interface operations {
                     fullName?: string;
                     phone?: string;
                     /** @enum {string} */
-                    role?: "ADMIN" | "ADVISOR" | "EDITOR";
+                    role?: "ADMIN" | "ADVISOR" | "EDITOR" | "MANAGER";
                 };
             };
         };
@@ -626,7 +772,7 @@ export interface operations {
                         email: string;
                         phone: string;
                         /** @enum {string} */
-                        role: "ADMIN" | "ADVISOR" | "EDITOR";
+                        role: "ADMIN" | "ADVISOR" | "EDITOR" | "MANAGER";
                         /** @enum {string} */
                         status: "UNACTIVATED" | "ACTIVE" | "INACTIVE";
                         /** Format: date-time */
@@ -660,7 +806,7 @@ export interface operations {
                         email: string;
                         phone: string;
                         /** @enum {string} */
-                        role: "ADMIN" | "ADVISOR" | "EDITOR";
+                        role: "ADMIN" | "ADVISOR" | "EDITOR" | "MANAGER";
                         /** @enum {string} */
                         status: "UNACTIVATED" | "ACTIVE" | "INACTIVE";
                         /** Format: date-time */
@@ -695,7 +841,7 @@ export interface operations {
                             email: string;
                             phone: string;
                             /** @enum {string} */
-                            role: "ADMIN" | "ADVISOR" | "EDITOR";
+                            role: "ADMIN" | "ADVISOR" | "EDITOR" | "MANAGER";
                             /** @enum {string} */
                             status: "UNACTIVATED" | "ACTIVE" | "INACTIVE";
                             /** Format: date-time */
@@ -735,7 +881,7 @@ export interface operations {
                             email: string;
                             phone: string;
                             /** @enum {string} */
-                            role: "ADMIN" | "ADVISOR" | "EDITOR";
+                            role: "ADMIN" | "ADVISOR" | "EDITOR" | "MANAGER";
                             /** @enum {string} */
                             status: "UNACTIVATED" | "ACTIVE" | "INACTIVE";
                             /** Format: date-time */
@@ -798,6 +944,21 @@ export interface operations {
                              * @description Null until the invitation email has been queued
                              */
                             invitationQueuedAt: string | null;
+                            /** @description Where the latest invitation email got to. Null until it is queued */
+                            invitationMail: {
+                                /**
+                                 * @description QUEUED, SENT, DELAYED, DELIVERED, BOUNCED, COMPLAINED or REJECTED, as SES reported it. It only moves forward
+                                 * @enum {string}
+                                 */
+                                status: "QUEUED" | "SENT" | "DELAYED" | "DELIVERED" | "BOUNCED" | "COMPLAINED" | "REJECTED";
+                                /** @description Why, for a bounce, complaint, rejection or delay */
+                                detail: string | null;
+                                /**
+                                 * Format: date-time
+                                 * @description When the status last changed
+                                 */
+                                updatedAt: string;
+                            } | null;
                             /** Format: date-time */
                             createdAt: string;
                             candidate: {
@@ -832,7 +993,7 @@ export interface operations {
                     candidate: {
                         fullName: string;
                         email: string;
-                        phone?: string;
+                        phone: string;
                     };
                     /** @enum {string} */
                     level: "INTERMEDIATE" | "ADVANCED";
@@ -878,6 +1039,21 @@ export interface operations {
                              * @description Null until the invitation email has been queued
                              */
                             invitationQueuedAt: string | null;
+                            /** @description Where the latest invitation email got to. Null until it is queued */
+                            invitationMail: {
+                                /**
+                                 * @description QUEUED, SENT, DELAYED, DELIVERED, BOUNCED, COMPLAINED or REJECTED, as SES reported it. It only moves forward
+                                 * @enum {string}
+                                 */
+                                status: "QUEUED" | "SENT" | "DELAYED" | "DELIVERED" | "BOUNCED" | "COMPLAINED" | "REJECTED";
+                                /** @description Why, for a bounce, complaint, rejection or delay */
+                                detail: string | null;
+                                /**
+                                 * Format: date-time
+                                 * @description When the status last changed
+                                 */
+                                updatedAt: string;
+                            } | null;
                             /** Format: date-time */
                             createdAt: string;
                             candidate: {
@@ -936,6 +1112,21 @@ export interface operations {
                          * @description Null until the invitation email has been queued
                          */
                         invitationQueuedAt: string | null;
+                        /** @description Where the latest invitation email got to. Null until it is queued */
+                        invitationMail: {
+                            /**
+                             * @description QUEUED, SENT, DELAYED, DELIVERED, BOUNCED, COMPLAINED or REJECTED, as SES reported it. It only moves forward
+                             * @enum {string}
+                             */
+                            status: "QUEUED" | "SENT" | "DELAYED" | "DELIVERED" | "BOUNCED" | "COMPLAINED" | "REJECTED";
+                            /** @description Why, for a bounce, complaint, rejection or delay */
+                            detail: string | null;
+                            /**
+                             * Format: date-time
+                             * @description When the status last changed
+                             */
+                            updatedAt: string;
+                        } | null;
                         /** Format: date-time */
                         createdAt: string;
                         candidate: {
@@ -1007,6 +1198,21 @@ export interface operations {
                              * @description Null until the invitation email has been queued
                              */
                             invitationQueuedAt: string | null;
+                            /** @description Where the latest invitation email got to. Null until it is queued */
+                            invitationMail: {
+                                /**
+                                 * @description QUEUED, SENT, DELAYED, DELIVERED, BOUNCED, COMPLAINED or REJECTED, as SES reported it. It only moves forward
+                                 * @enum {string}
+                                 */
+                                status: "QUEUED" | "SENT" | "DELAYED" | "DELIVERED" | "BOUNCED" | "COMPLAINED" | "REJECTED";
+                                /** @description Why, for a bounce, complaint, rejection or delay */
+                                detail: string | null;
+                                /**
+                                 * Format: date-time
+                                 * @description When the status last changed
+                                 */
+                                updatedAt: string;
+                            } | null;
                             /** Format: date-time */
                             createdAt: string;
                             candidate: {
@@ -1066,6 +1272,21 @@ export interface operations {
                              * @description Null until the invitation email has been queued
                              */
                             invitationQueuedAt: string | null;
+                            /** @description Where the latest invitation email got to. Null until it is queued */
+                            invitationMail: {
+                                /**
+                                 * @description QUEUED, SENT, DELAYED, DELIVERED, BOUNCED, COMPLAINED or REJECTED, as SES reported it. It only moves forward
+                                 * @enum {string}
+                                 */
+                                status: "QUEUED" | "SENT" | "DELAYED" | "DELIVERED" | "BOUNCED" | "COMPLAINED" | "REJECTED";
+                                /** @description Why, for a bounce, complaint, rejection or delay */
+                                detail: string | null;
+                                /**
+                                 * Format: date-time
+                                 * @description When the status last changed
+                                 */
+                                updatedAt: string;
+                            } | null;
                             /** Format: date-time */
                             createdAt: string;
                             candidate: {
@@ -1083,6 +1304,265 @@ export interface operations {
                         emailQueued: boolean;
                     };
                 };
+            };
+        };
+    };
+    ReportsController_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        scheduleId: number;
+                        /** @enum {string} */
+                        level: "INTERMEDIATE" | "ADVANCED";
+                        candidate: {
+                            fullName: string;
+                            email: string;
+                            phone: string | null;
+                            workExperienceYears: number;
+                        };
+                        advisor: string;
+                        template: {
+                            name: string;
+                            version: number;
+                            durationMinutes: number;
+                            passPercent: number;
+                        };
+                        attempt: {
+                            /** Format: date-time */
+                            startedAt: string;
+                            /** Format: date-time */
+                            submittedAt: string;
+                            /**
+                             * @description CANDIDATE pressed Submit; TIMEOUT means the server submitted at the deadline
+                             * @enum {string}
+                             */
+                            submitReason: "CANDIDATE" | "TIMEOUT";
+                        };
+                        result: {
+                            totalMarks: number;
+                            obtainedMarks: number;
+                            /** @description 0 to 100, two decimals */
+                            percentage: number;
+                            passed: boolean;
+                        };
+                        topics: {
+                            topic: string;
+                            questions: number;
+                            answered: number;
+                            correct: number;
+                            totalMarks: number;
+                            obtainedMarks: number;
+                            items: {
+                                questionVersionId: number;
+                                /** @description The question’s code, such as ETATA1. For staff only */
+                                code: string;
+                                /** @description Position inside its topic, in the order the candidate saw */
+                                number: number;
+                                /** @enum {string} */
+                                status: "correct" | "wrong" | "blank";
+                                marks: number;
+                                totalMarks: number;
+                                statementMd: string;
+                                /** @description The code the question refers to, one entry per language. Null when the question has none */
+                                codeStubs: {
+                                    language: string;
+                                    label: string;
+                                    code: string;
+                                }[] | null;
+                                options: {
+                                    id: number;
+                                    textMd: string;
+                                    isCorrect: boolean;
+                                    /** @description The option the candidate picked */
+                                    chosen: boolean;
+                                }[];
+                            }[];
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    CandidateController_createSession: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    token: string;
+                    email: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CandidateController_endSession: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CandidateController_getTest: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CandidateController_startAttempt: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    workExperienceYears: number;
+                    declarations: {
+                        /** @enum {boolean} */
+                        ownWork: true;
+                        /** @enum {boolean} */
+                        accurateDetails: true;
+                    };
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CandidateController_getAttempt: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CandidateController_saveAnswer: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                questionVersionId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    optionId: number | null;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CandidateController_submit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CandidateController_feedback: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    rating: number;
+                    comment?: string;
+                };
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

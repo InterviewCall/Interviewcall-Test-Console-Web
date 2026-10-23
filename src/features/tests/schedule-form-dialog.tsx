@@ -113,7 +113,7 @@ function ScheduleForm({ schedule, onDone }: { schedule: ReturnType<typeof useSch
             {...register("email")}
           />
           <TextField
-            label="Phone (optional)"
+            label="Phone"
             type="tel"
             autoComplete="off"
             placeholder="+91 98765 43210"

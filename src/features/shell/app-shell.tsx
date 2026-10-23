@@ -12,7 +12,7 @@ import { LogoMark, Wordmark } from "@/components/layout/brand";
 import { cn } from "@/lib/cn";
 import { navFor, useSessionUser } from "./session";
 
-const ROLE_LABEL = { ADMIN: "Admin", ADVISOR: "Advisor", EDITOR: "Editor" } as const;
+const ROLE_LABEL = { ADMIN: "Admin", MANAGER: "Manager", ADVISOR: "Advisor", EDITOR: "Editor" } as const;
 
 function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   const user = useSessionUser();
@@ -80,7 +80,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-dvh lg:flex">
       {/* Desktop rail */}
-      <aside className="sticky top-0 hidden h-dvh w-72 shrink-0 flex-col justify-between bg-brand p-6 text-white lg:flex">
+      <aside data-print="hide" className="sticky top-0 hidden h-dvh w-72 shrink-0 flex-col justify-between bg-brand p-6 text-white lg:flex">
         <div className="flex flex-col gap-8">
           <Wordmark size={44} />
           <NavLinks />
@@ -89,7 +89,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </aside>
 
       {/* Mobile top bar and drawer */}
-      <div className="sticky top-0 z-30 flex items-center justify-between bg-brand px-4 py-3 text-white shadow-[0_8px_24px_-12px_rgb(0_0_0/0.6)] lg:hidden">
+      <div data-print="hide" className="sticky top-0 z-30 flex items-center justify-between bg-brand px-4 py-3 text-white shadow-[0_8px_24px_-12px_rgb(0_0_0/0.6)] lg:hidden">
         <span className="flex items-center gap-2.5">
           <LogoMark size={34} />
           <span className="font-display text-base font-semibold tracking-tight">InterviewCall</span>

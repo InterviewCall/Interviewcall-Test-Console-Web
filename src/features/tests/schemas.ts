@@ -20,7 +20,8 @@ const email = z.string().trim().toLowerCase().min(1, "Enter the candidate's emai
 const phone = z
   .string()
   .trim()
-  .refine((value) => value === "" || /^\+?[0-9][0-9\s()-]{5,48}$/.test(value), "Enter a phone number, like +91 98765 43210");
+  .min(1, "Enter the candidate's phone number")
+  .regex(/^\+?[0-9][0-9\s()-]{5,48}$/, "Enter a phone number, like +91 98765 43210");
 
 const level = z.string().pipe(z.enum(TEST_LEVELS as [string, ...string[]], { error: "Pick a level" }));
 
@@ -80,12 +81,11 @@ export type ScheduleTestValues = z.infer<typeof scheduleTestSchema>;
 
 /** The request body the API expects. Times carry the IST offset so the server stores the right instant. */
 export function toScheduleBody(values: ScheduleTestValues) {
-  const phoneValue = values.phone.trim();
   return {
     candidate: {
       fullName: values.fullName,
       email: values.email,
-      ...(phoneValue ? { phone: phoneValue } : {}),
+      phone: values.phone.trim(),
     },
     level: values.level as TestLevel,
     startsAt: (istToDate(values.date, values.startTime) as Date).toISOString(),

@@ -26,8 +26,8 @@ export interface NavItem {
 
 /** Every page the console has today. New features add themselves here. */
 export const NAV_ITEMS: readonly NavItem[] = [
-  { href: "/tests", label: "Tests", icon: "calendar", roles: ["ADMIN", "ADVISOR"] },
-  { href: "/users", label: "Staff", icon: "users", roles: ["ADMIN"] },
+  { href: "/tests", label: "Tests", icon: "calendar", roles: ["ADMIN", "MANAGER", "ADVISOR"] },
+  { href: "/users", label: "Staff", icon: "users", roles: ["ADMIN", "MANAGER"] },
   { href: "/account", label: "Your account", icon: "account" },
 ];
 

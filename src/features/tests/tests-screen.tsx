@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -26,6 +27,7 @@ import { LEVEL_LABEL, STATUS_LABEL, statusBadge } from "./labels";
 import { canReschedule, canResend } from "./resend";
 import { RescheduleDialog } from "./reschedule-dialog";
 import { ScheduleFormDialog } from "./schedule-form-dialog";
+import { MailStatusLine } from "./mail-status";
 import { StatusOverview } from "./status-overview";
 import { TestDetailsDialog } from "./test-details-dialog";
 
@@ -80,7 +82,7 @@ export function TestsScreen() {
       <div className="rounded-panel border border-line bg-surface shadow-card">
         <EmptyState
           icon="key"
-          title="Advisors and admins only"
+          title="Advisors, managers and admins only"
           action={
             <Link href="/account" className="font-medium text-primary underline underline-offset-2">
               Go to your account
@@ -92,11 +94,13 @@ export function TestsScreen() {
       </div>
     );
   }
-  return <TestsList isAdmin={me.role === "ADMIN"} />;
+  // Admins and managers work with everyone's tests; advisors only with their own.
+  return <TestsList seesAll={me.role === "ADMIN" || me.role === "MANAGER"} />;
 }
 
-function TestsList({ isAdmin }: { isAdmin: boolean }) {
+function TestsList({ seesAll }: { seesAll: boolean }) {
   const toast = useToast();
+  const router = useRouter();
   const resend = useResendInvitation();
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<TestStatus | "">("");
@@ -152,6 +156,13 @@ function TestsList({ isAdmin }: { isAdmin: boolean }) {
     return [
       { label: "View details", icon: "info", onSelect: () => setOpenId(schedule.id) },
       {
+        label: "View report",
+        icon: "report",
+        onSelect: () => router.push(`/tests/${schedule.id}/report`),
+        disabled: schedule.status !== "SUBMITTED",
+        hint: schedule.status === "SUBMITTED" ? undefined : "Available once the candidate has submitted.",
+      },
+      {
         label: "Reschedule",
         icon: "calendar",
         onSelect: () => setReschedulingId(schedule.id),
@@ -172,7 +183,7 @@ function TestsList({ isAdmin }: { isAdmin: boolean }) {
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Tests"
-        description={isAdmin ? "Every test scheduled for a candidate." : "The tests you've scheduled for candidates."}
+        description={seesAll ? "Every test scheduled for a candidate." : "The tests you've scheduled for candidates."}
         actions={
           <Button icon="plus" onClick={() => setScheduling(true)}>
             Schedule a test
@@ -303,7 +314,7 @@ function TestsList({ isAdmin }: { isAdmin: boolean }) {
                   <Th className="hidden sm:table-cell">When (IST)</Th>
                   <Th className="hidden md:table-cell">Level</Th>
                   <Th className="hidden sm:table-cell">Status</Th>
-                  {isAdmin ? <Th className="hidden lg:table-cell">Scheduled by</Th> : null}
+                  {seesAll ? <Th className="hidden lg:table-cell">Scheduled by</Th> : null}
                   <Th className="w-14">
                     <span className="sr-only">Actions</span>
                   </Th>
@@ -312,7 +323,6 @@ function TestsList({ isAdmin }: { isAdmin: boolean }) {
               <tbody>
                 {tests.data.items.map((schedule) => {
                   const badge = statusBadge(schedule);
-                  const unsent = schedule.invitationQueuedAt === null;
                   return (
                     <tr key={schedule.id} className="hover:bg-sunken/60">
                       <Td>
@@ -336,6 +346,9 @@ function TestsList({ isAdmin }: { isAdmin: boolean }) {
                                   {LEVEL_LABEL[schedule.level]} · {schedule.durationMinutes} min
                                 </span>
                               </span>
+                              <span className="mt-1 block">
+                                <MailStatusLine schedule={schedule} onlyProblems />
+                              </span>
                             </span>
                           </span>
                         </button>
@@ -352,15 +365,10 @@ function TestsList({ isAdmin }: { isAdmin: boolean }) {
                           <Badge tone={badge.tone} dot>
                             {badge.label}
                           </Badge>
-                          {unsent ? (
-                            <span className="inline-flex items-center gap-1 text-[13px] text-warning">
-                              <Icon name="alert" size={14} />
-                              Email not sent
-                            </span>
-                          ) : null}
+                          <MailStatusLine schedule={schedule} />
                         </div>
                       </Td>
-                      {isAdmin ? <Td className="hidden text-ink-muted lg:table-cell">{schedule.invitedBy.fullName}</Td> : null}
+                      {seesAll ? <Td className="hidden text-ink-muted lg:table-cell">{schedule.invitedBy.fullName}</Td> : null}
                       <Td className="text-right">
                         <Menu label={`Actions for ${schedule.candidate.fullName}`} entries={rowMenu(schedule)} />
                       </Td>
@@ -384,7 +392,7 @@ function TestsList({ isAdmin }: { isAdmin: boolean }) {
       <RescheduleDialog schedule={rescheduling} onClose={() => setReschedulingId(null)} />
       <TestDetailsDialog
         schedule={opened}
-        showOwner={isAdmin}
+        showOwner={seesAll}
         resending={resendingId === opened?.id}
         onResend={(schedule) => void resendInvitation(schedule)}
         onReschedule={(schedule) => {

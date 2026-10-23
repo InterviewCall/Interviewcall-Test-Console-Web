@@ -1,4 +1,4 @@
-import type { TestLevel, TestStatus } from "@/lib/api/types";
+import type { MailStatus, TestLevel, TestStatus } from "@/lib/api/types";
 
 export const LEVEL_LABEL: Record<TestLevel, string> = {
   INTERMEDIATE: "Intermediate",
@@ -39,3 +39,27 @@ export function statusBadge(schedule: { status: TestStatus; latestStartAt: strin
   }
   return { label: STATUS_LABEL[schedule.status], tone: STATUS_TONE[schedule.status] };
 }
+
+type Tone = "info" | "warning" | "success" | "neutral" | "danger";
+
+/**
+ * Where the invitation email got to, as SES reported it. `problem` ones need someone to look at them:
+ * the candidate may not have their link.
+ */
+export const MAIL_STATUS: Record<MailStatus, { label: string; tone: Tone; problem: boolean }> = {
+  QUEUED: { label: "Email queued", tone: "neutral", problem: false },
+  SENT: { label: "Email sent", tone: "neutral", problem: false },
+  DELAYED: { label: "Email delayed", tone: "warning", problem: true },
+  DELIVERED: { label: "Email delivered", tone: "success", problem: false },
+  BOUNCED: { label: "Email bounced", tone: "danger", problem: true },
+  COMPLAINED: { label: "Marked as spam", tone: "warning", problem: true },
+  REJECTED: { label: "Email rejected", tone: "danger", problem: true },
+};
+
+/** What the candidate and staff should do about a problem, shown in the details dialog. */
+export const MAIL_PROBLEM_ADVICE: Partial<Record<MailStatus, string>> = {
+  BOUNCED: "The candidate hasn't received their link. Check the address with them, or contact them another way.",
+  REJECTED: "The email was never sent. Try Resend invitation, or contact the candidate another way.",
+  COMPLAINED: "The candidate reported this email as spam. They may still have their link; check with them.",
+  DELAYED: "The candidate's mail server is slow to accept it. It will keep trying; if the test is soon, contact them another way.",
+};

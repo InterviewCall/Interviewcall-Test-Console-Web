@@ -10,7 +10,7 @@ export const metadata: Metadata = { title: "Staff" };
 
 export default function UsersPage() {
   return (
-    <AdminOnly>
+    <AdminOnly also={["MANAGER"]}>
       <UsersScreen />
     </AdminOnly>
   );
