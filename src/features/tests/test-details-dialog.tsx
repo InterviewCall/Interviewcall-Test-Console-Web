@@ -10,7 +10,7 @@ import type { TestSchedule } from "@/lib/api/types";
 import { formatDateTime } from "@/lib/format";
 import { formatIstDate, formatIstTime, formatIstWindow } from "./ist";
 import { LEVEL_LABEL, MAIL_PROBLEM_ADVICE, MAIL_STATUS, STATUS_LABEL, STATUS_TONE } from "./labels";
-import { canReschedule, canResend } from "./resend";
+import { canGetNewLink, canReschedule, canResend } from "./resend";
 
 function Row({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -27,6 +27,7 @@ export function TestDetailsDialog({
   resending,
   onResend,
   onReschedule,
+  onNewLink,
   onClose,
 }: {
   schedule: TestSchedule | null;
@@ -34,10 +35,12 @@ export function TestDetailsDialog({
   resending: boolean;
   onResend: (schedule: TestSchedule) => void;
   onReschedule: (schedule: TestSchedule) => void;
+  onNewLink: (schedule: TestSchedule) => void;
   onClose: () => void;
 }) {
   const resend = schedule ? canResend(schedule) : null;
   const reschedule = schedule ? canReschedule(schedule) : null;
+  const newLink = schedule ? canGetNewLink(schedule) : null;
 
   return (
     <Dialog
@@ -118,6 +121,16 @@ export function TestDetailsDialog({
               ) : (
                 `Queued ${formatDateTime(schedule.invitationQueuedAt)}`
               )}
+              {newLink?.ok ? (
+                <div className="mt-2">
+                  <Button variant="secondary" size="sm" icon="key" onClick={() => onNewLink(schedule)}>
+                    Get new link
+                  </Button>
+                  <span className="mt-1.5 block text-[13px] text-ink-muted">
+                    Share it yourself if the email isn&apos;t reaching them. Only the newest link works.
+                  </span>
+                </div>
+              ) : null}
             </Row>
           </dl>
         </div>

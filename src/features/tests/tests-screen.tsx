@@ -24,7 +24,8 @@ import type { ListTestSchedulesParams, TestLevel, TestSchedule, TestStatus } fro
 import { useResendInvitation, useTestSchedules } from "./api";
 import { formatIstDate, formatIstTime, istDayBounds } from "./ist";
 import { LEVEL_LABEL, STATUS_LABEL, statusBadge } from "./labels";
-import { canReschedule, canResend } from "./resend";
+import { canGetNewLink, canReschedule, canResend } from "./resend";
+import { NewLinkDialog } from "./new-link-dialog";
 import { RescheduleDialog } from "./reschedule-dialog";
 import { ScheduleFormDialog } from "./schedule-form-dialog";
 import { MailStatusLine } from "./mail-status";
@@ -111,6 +112,7 @@ function TestsList({ seesAll }: { seesAll: boolean }) {
   const [openId, setOpenId] = useState<number | null>(null);
   const [reschedulingId, setReschedulingId] = useState<number | null>(null);
   const [resendingId, setResendingId] = useState<number | null>(null);
+  const [linkForId, setLinkForId] = useState<number | null>(null);
 
   const q = useDebounced(search.trim());
   const params: ListTestSchedulesParams = {
@@ -125,6 +127,7 @@ function TestsList({ seesAll }: { seesAll: boolean }) {
   const filtered = Boolean(q || status || level || when);
   const opened = tests.data?.items.find((item) => item.id === openId) ?? null;
   const rescheduling = tests.data?.items.find((item) => item.id === reschedulingId) ?? null;
+  const linkFor = tests.data?.items.find((item) => item.id === linkForId) ?? null;
 
   function clearFilters() {
     setSearch("");
@@ -153,6 +156,7 @@ function TestsList({ seesAll }: { seesAll: boolean }) {
   function rowMenu(schedule: TestSchedule): MenuEntry[] {
     const allowed = canResend(schedule);
     const movable = canReschedule(schedule);
+    const linkable = canGetNewLink(schedule);
     return [
       { label: "View details", icon: "info", onSelect: () => setOpenId(schedule.id) },
       {
@@ -175,6 +179,13 @@ function TestsList({ seesAll }: { seesAll: boolean }) {
         onSelect: () => void resendInvitation(schedule),
         disabled: !allowed.ok,
         hint: allowed.ok ? undefined : allowed.reason,
+      },
+      {
+        label: "Get new link",
+        icon: "key",
+        onSelect: () => setLinkForId(schedule.id),
+        disabled: !linkable.ok,
+        hint: linkable.ok ? undefined : linkable.reason,
       },
     ];
   }
@@ -390,6 +401,7 @@ function TestsList({ seesAll }: { seesAll: boolean }) {
 
       <ScheduleFormDialog open={scheduling} onClose={() => setScheduling(false)} />
       <RescheduleDialog schedule={rescheduling} onClose={() => setReschedulingId(null)} />
+      <NewLinkDialog schedule={linkFor} onClose={() => setLinkForId(null)} />
       <TestDetailsDialog
         schedule={opened}
         showOwner={seesAll}
@@ -398,6 +410,10 @@ function TestsList({ seesAll }: { seesAll: boolean }) {
         onReschedule={(schedule) => {
           setOpenId(null);
           setReschedulingId(schedule.id);
+        }}
+        onNewLink={(schedule) => {
+          setOpenId(null);
+          setLinkForId(schedule.id);
         }}
         onClose={() => setOpenId(null)}
       />

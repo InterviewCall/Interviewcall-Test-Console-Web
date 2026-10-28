@@ -43,6 +43,9 @@ export type RescheduleTestBody = RequestBody<"TestSchedulesController_reschedule
 /** What scheduling and resending return: the schedule, and whether its invitation email was queued. */
 export type ScheduleWithEmailStatus = Body<"TestSchedulesController_schedule", 201>;
 
+/** A fresh start link for a candidate. Returned once and never stored, so it can only be copied from this response. */
+export type NewTestLink = Body<"TestSchedulesController_issueNewLink", 200>;
+
 export const TEST_LEVELS: readonly TestLevel[] = ["INTERMEDIATE", "ADVANCED"];
 export const TEST_STATUSES: readonly TestStatus[] = ["INVITED", "IN_PROGRESS", "SUBMITTED", "EXPIRED"];
 

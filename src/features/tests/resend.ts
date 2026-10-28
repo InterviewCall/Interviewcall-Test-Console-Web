@@ -17,3 +17,6 @@ export function canReschedule(schedule: TestSchedule): { ok: true } | { ok: fals
   }
   return { ok: true };
 }
+
+/** A new link follows the same rule as resending: the test must still be waiting to start, with time left to start it. */
+export const canGetNewLink = canResend;

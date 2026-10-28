@@ -266,6 +266,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/test-schedules/{id}/new-link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Make a new start link and return it, without emailing it
+         * @description For passing the link on another way. The previous link stops working at once, and the new one is shown only in this response. Allowed while the test is still invited and can still be started; otherwise 409. Advisors can do this only for their own tests.
+         */
+        post: operations["TestSchedulesController_issueNewLink"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/test-schedules/{id}/resend-email": {
         parameters: {
             query?: never;
@@ -1276,6 +1296,30 @@ export interface operations {
                         };
                         /** @description True when the invitation email was queued. False: use resend-email once the problem is fixed. */
                         emailQueued: boolean;
+                    };
+                };
+            };
+        };
+    };
+    TestSchedulesController_issueNewLink: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The candidate’s new start link. Shown only this once: only its hash is stored, and the previous link no longer works */
+                        url: string;
                     };
                 };
             };

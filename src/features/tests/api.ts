@@ -4,6 +4,7 @@ import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tansta
 import { http } from "@/lib/api/http";
 import type {
   ListTestSchedulesParams,
+  NewTestLink,
   RescheduleTestBody,
   ScheduleTestBody,
   ScheduleWithEmailStatus,
@@ -36,6 +37,13 @@ export function useResendInvitation() {
   return useMutation({
     mutationFn: async (id: number) => (await http.post<ScheduleWithEmailStatus>(`/test-schedules/${id}/resend-email`)).data,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: testsKeys.all }),
+  });
+}
+
+/** Nothing in the list changes when a link is made, so there is nothing to refetch. */
+export function useNewTestLink() {
+  return useMutation({
+    mutationFn: async (id: number) => (await http.post<NewTestLink>(`/test-schedules/${id}/new-link`)).data,
   });
 }
 
