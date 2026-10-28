@@ -20,11 +20,35 @@ interface DialogProps {
 const widths = { sm: "max-w-sm", md: "max-w-md", lg: "max-w-lg" } as const;
 
 /**
+ * Native <dialog> does not stop the page behind it from scrolling, so an open dialog locks it. The lock belongs
+ * to the component's effect, not to CSS that asks "is any <dialog> open?". Next keeps the page you navigated
+ * away from alive in the background, with its dialog still open, and that kind of rule would then lock the
+ * next page too. An effect is torn down when its page is hidden or removed, so the lock goes with it.
+ */
+let openDialogs = 0;
+function useScrollLock(open: boolean) {
+  useEffect(() => {
+    if (!open) return;
+    const root = document.documentElement;
+    openDialogs += 1;
+    root.dataset.scrollLocked = "";
+    return () => {
+      openDialogs -= 1;
+      if (openDialogs <= 0) {
+        openDialogs = 0;
+        delete root.dataset.scrollLocked;
+      }
+    };
+  }, [open]);
+}
+
+/**
  * A modal built on the native <dialog>: focus is trapped, Escape closes it, and the
  * page behind is inert. Children mount only while open, so forms start fresh each time.
  */
 export function Dialog({ open, onClose, title, description, children, footer, size = "md", dismissible = true }: DialogProps) {
   const ref = useRef<HTMLDialogElement>(null);
+  useScrollLock(open);
 
   useEffect(() => {
     const el = ref.current;

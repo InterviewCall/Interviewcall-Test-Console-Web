@@ -56,6 +56,7 @@ export function TestDetailsDialog({
           {schedule?.status === "SUBMITTED" ? (
             <Link
               href={`/tests/${schedule.id}/report`}
+              onClick={onClose}
               className="inline-flex h-10 items-center justify-center gap-2 rounded-control bg-action px-4 text-sm font-medium text-on-action hover:bg-action-hover"
             >
               View report

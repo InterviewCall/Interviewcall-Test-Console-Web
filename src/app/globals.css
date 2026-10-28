@@ -191,8 +191,8 @@ body {
   background-repeat: repeat, no-repeat;
 }
 
-/* Native <dialog> does not stop the page behind it from scrolling. */
-html:has(dialog[open]) {
+/* Set by the Dialog component while a dialog is open (see components/ui/dialog.tsx). */
+html[data-scroll-locked] {
   overflow: hidden;
 }
 
